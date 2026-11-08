@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0e13" id="themeColor" />
+  <meta name="description" content="Samay — a beautiful clock, alarm, timer, stopwatch and world clock for the web." />
+  <title>Samay · Clock</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand"><span class="brand-dot"></span> Samay</div>
+      <button class="icon-btn" id="settingsBtn" aria-label="Settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3.2"/>
+          <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>
+        </svg>
+      </button>
+    </header>
+
+    <main class="pages">
+      <!-- ================= CLOCK ================= -->
+      <section class="page" data-page="clock">
+        <div class="hero">
+          <div class="hero-time">
+            <span id="clockMain" class="digital">--:--</span>
+            <span id="clockSec" class="digital-sec">:--</span>
+          </div>
+          <div id="clockAmPm" class="ampm"></div>
+          <div class="hero-date" id="clockDate">—</div>
+          <div class="next-alarm" id="nextAlarm">No alarms set</div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h2>World clock</h2>
+              <p class="hint">Times around the planet</p>
+            </div>
+            <button class="icon-btn accent" id="addCityBtn" aria-label="Add city">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <path d="M12 5v14M5 12h14"/>
+              </svg>
+            </button>
+          </div>
+          <ul class="world-list" id="worldList"></ul>
+        </div>
+      </section>
+
+      <!-- ================= ALARM ================= -->
+      <section class="page" data-page="alarm">
+        <div class="page-head">
+          <div>
+            <h1>Alarms</h1>
+            <p class="hint">Never miss a moment</p>
+          </div>
+          <button class="fab" id="addAlarmBtn" aria-label="Add alarm">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+          </button>
+        </div>
+        <ul class="alarm-list" id="alarmList"></ul>
+        <p class="empty" id="alarmEmpty" hidden>No alarms yet.<br /><span>Tap + to create your first alarm.</span></p>
+      </section>
+
+      <!-- ================= TIMER ================= -->
+      <section class="page" data-page="timer">
+        <div class="page-head">
+          <div>
+            <h1>Timer</h1>
+            <p class="hint">Count down to anything</p>
+          </div>
+        </div>
+
+        <div class="timer-wrap">
+          <svg class="ring" viewBox="0 0 320 320" aria-hidden="true">
+            <defs>
+              <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#7aa2ff" />
+                <stop offset="100%" stop-color="#b18cff" />
+              </linearGradient>
+            </defs>
+            <circle class="ring-bg" cx="160" cy="160" r="140" />
+            <circle class="ring-fg" id="timerRing" cx="160" cy="160" r="140" transform="rotate(-90 160 160)" />
+          </svg>
+          <div class="timer-center">
+            <div class="timer-display" id="timerDisplay">00:00</div>
+            <div class="timer-sub" id="timerSub">Ready</div>
+          </div>
+        </div>
+
+        <div class="timer-setup" id="timerSetup">
+          <div class="time-fields">
+            <label><input type="number" id="tHours" min="0" max="99" value="0" inputmode="numeric" /><span>hours</span></label>
+            <label><input type="number" id="tMinutes" min="0" max="59" value="0" inputmode="numeric" /><span>min</span></label>
+            <label><input type="number" id="tSeconds" min="0" max="59" value="0" inputmode="numeric" /><span>sec</span></label>
+          </div>
+          <div class="presets" id="presets">
+            <button class="chip" data-min="1">1 min</button>
+            <button class="chip" data-min="3">3 min</button>
+            <button class="chip" data-min="5">5 min</button>
+            <button class="chip" data-min="10">10 min</button>
+            <button class="chip" data-min="15">15 min</button>
+            <button class="chip" data-min="30">30 min</button>
+            <button class="chip" data-min="60">1 hour</button>
+          </div>
+        </div>
+
+        <div class="timer-actions">
+          <button class="btn ghost" id="timerReset" hidden>Reset</button>
+          <button class="btn primary" id="timerStart">Start</button>
+          <button class="btn ghost" id="timerPlus" hidden>+1 min</button>
+        </div>
+      </section>
+
+      <!-- ================= STOPWATCH ================= -->
+      <section class="page" data-page="stopwatch">
+        <div class="page-head">
+          <div>
+            <h1>Stopwatch</h1>
+            <p class="hint">Measure every millisecond</p>
+          </div>
+        </div>
+
+        <div class="sw-display">
+          <span id="swMain">00:00</span><span id="swCent" class="sw-cent">.00</span>
+        </div>
+
+        <div class="sw-actions">
+          <button class="btn ghost" id="swReset">Reset</button>
+          <button class="btn primary" id="swStart">Start</button>
+          <button class="btn ghost" id="swLap" disabled>Lap</button>
+        </div>
+
+        <ul class="lap-list" id="lapList"></ul>
+      </section>
+    </main>
+
+    <nav class="tabbar" aria-label="Sections">
+      <button class="tab" data-tab="alarm" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="13" r="8"/><path d="M12 9v4.2l2.6 1.6M5 3.4 2.6 5.6M19 3.4l2.4 2.2"/>
+        </svg>
+        <span>Alarm</span>
+      </button>
+      <button class="tab" data-tab="clock" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9"/><path d="M12 7v5.2l3.6 2.1"/>
+        </svg>
+        <span>Clock</span>
+      </button>
+      <button class="tab" data-tab="timer" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="13.5" r="7.5"/><path d="M12 10v4M9.4 2.4h5.2M12 2.4v3.1"/>
+        </svg>
+        <span>Timer</span>
+      </button>
+      <button class="tab" data-tab="stopwatch" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="13.5" r="7.5"/><path d="M12 13.5 15 11M9.4 2.4h5.2M12 2.4v3.1M19.3 6.7l1.6-1.6M4.7 6.7 3.1 5.1"/>
+        </svg>
+        <span>Stopwatch</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- ================= ALARM SHEET ================= -->
+  <div class="sheet-backdrop" id="alarmSheet">
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="alarmSheetTitle">
+      <div class="sheet-head">
+        <h2 id="alarmSheetTitle">New alarm</h2>
+        <button class="icon-btn" data-close aria-label="Close">✕</button>
+      </div>
+      <input type="time" id="alarmTime" class="time-input" />
+      <input type="text" id="alarmLabel" class="text-input" placeholder="Label (optional)" maxlength="28" autocomplete="off" />
+      <div class="day-row" id="dayRow"></div>
+      <div class="sheet-actions">
+        <button class="btn danger" id="alarmDelete" hidden>Delete</button>
+        <button class="btn primary" id="alarmSave">Save alarm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= CITY SHEET ================= -->
+  <div class="sheet-backdrop" id="citySheet">
+    <div class="sheet tall" role="dialog" aria-modal="true" aria-labelledby="citySheetTitle">
+      <div class="sheet-head">
+        <h2 id="citySheetTitle">Add city</h2>
+        <button class="icon-btn" data-close aria-label="Close">✕</button>
+      </div>
+      <input type="search" id="citySearch" class="text-input" placeholder="Search city or country…" autocomplete="off" />
+      <ul class="city-picker" id="cityPicker"></ul>
+    </div>
+  </div>
+
+  <!-- ================= SETTINGS SHEET ================= -->
+  <div class="sheet-backdrop" id="settingsSheet">
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <div class="sheet-head">
+        <h2 id="settingsTitle">Settings</h2>
+        <button class="icon-btn" data-close aria-label="Close">✕</button>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-name">24-hour time</div>
+          <div class="setting-sub">Show 13:30 instead of 1:30 PM</div>
+        </div>
+        <label class="switch"><input type="checkbox" id="set24" /><span></span></label>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-name">Light theme</div>
+          <div class="setting-sub">Easier on the eyes in daylight</div>
+        </div>
+        <label class="switch"><input type="checkbox" id="setLight" /><span></span></label>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-name">Alarm sound</div>
+          <div class="setting-sub">Play a chime when alarms ring</div>
+        </div>
+        <label class="switch"><input type="checkbox" id="setSound" /><span></span></label>
+      </div>
+      <p class="sheet-foot">Samay · offline-ready clock for your browser</p>
+    </div>
+  </div>
+
+  <!-- ================= RINGING OVERLAY ================= -->
+  <div class="overlay ring-overlay" id="ringOverlay" hidden>
+    <div class="ring-glow"></div>
+    <div class="ring-label" id="ringLabel">Alarm</div>
+    <div class="ring-time" id="ringTime">07:00</div>
+    <div class="ring-date" id="ringDate"></div>
+    <div class="overlay-actions">
+      <button class="btn ghost" id="ringSnooze">Snooze 5 min</button>
+      <button class="btn primary" id="ringDismiss">Dismiss</button>
+    </div>
+  </div>
+
+  <!-- ================= TIMER DONE OVERLAY ================= -->
+  <div class="overlay timer-overlay" id="timerOverlay" hidden>
+    <div class="overlay-emoji">⏱️</div>
+    <h2>Time's up</h2>
+    <p id="timerOverlaySub">Your timer has finished.</p>
+    <div class="overlay-actions">
+      <button class="btn primary" id="timerDoneBtn">Done</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
