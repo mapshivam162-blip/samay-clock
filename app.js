@@ -127,7 +127,10 @@
   const DEFAULT_SETTINGS = {
     use24: false,
     theme: "dark",
+    skin: "material",
     sound: true,
+    uiSound: true,
+    snoozeMin: 5,
     cities: [
       localZone,
       "Europe/London",
@@ -149,14 +152,28 @@
   const themeColor = $("#themeColor");
 
   function applySettings() {
-    document.documentElement.dataset.theme = settings.theme;
+    const skin = settings.skin === "ios" ? "ios" : "material";
+    const theme = settings.theme === "light" ? "light" : "dark";
+    document.documentElement.dataset.skin = skin;
+    document.documentElement.dataset.theme = theme;
     themeColor.setAttribute(
       "content",
-      settings.theme === "dark" ? "#0a0e13" : "#eef2f8"
+      (skin === "ios"
+        ? (theme === "dark" ? "#000000" : "#f2f2f7")
+        : (theme === "dark" ? "#0a0e13" : "#eef2f8"))
     );
     $("#set24").checked = settings.use24;
-    $("#setLight").checked = settings.theme === "light";
     $("#setSound").checked = settings.sound;
+    $("#setUiSound").checked = settings.uiSound;
+    $$("#themeSeg button").forEach((btn) =>
+      btn.classList.toggle(
+        "on",
+        btn.dataset.skin === skin && btn.dataset.theme === theme
+      )
+    );
+    $$("#snoozeSeg button").forEach((btn) =>
+      btn.classList.toggle("on", Number(btn.dataset.min) === settings.snoozeMin)
+    );
   }
 
   /* ------------------------------------------------------------
@@ -284,7 +301,7 @@
 
   document.addEventListener("pointerdown", () => ensureAudio(), { once: true });
 
-  function tone(freq, delay, duration, volume = 0.2, type = "sine") {
+  function tone(freq, delay, duration, volume = 0.2, type = "sine", slideTo = null) {
     const ctx = ensureAudio();
     if (!ctx) return;
     try {
@@ -293,6 +310,12 @@
       const gain = ctx.createGain();
       osc.type = type;
       osc.frequency.setValueAtTime(freq, start);
+      if (slideTo) {
+        osc.frequency.exponentialRampToValueAtTime(
+          Math.max(1, slideTo),
+          start + duration
+        );
+      }
       gain.gain.setValueAtTime(0.0001, start);
       gain.gain.exponentialRampToValueAtTime(volume, start + 0.02);
       gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
@@ -330,6 +353,106 @@
     tone(1046.5, 0, 0.16, 0.2, "sine");
     tone(1318.5, 0.16, 0.18, 0.2, "sine");
     tone(1568, 0.34, 0.32, 0.18, "sine");
+  }
+
+  /* ------------------------------------------------------------
+      Ringtone library — 6 built-in tones
+   ------------------------------------------------------------ */
+
+  const RINGTONES = [
+    {
+      id: "classic",
+      name: "Classic",
+      period: 1600,
+      pattern: () => {
+        tone(880, 0, 0.22, 0.22, "sine");
+        tone(660, 0.25, 0.22, 0.18, "sine");
+        tone(980, 0.5, 0.3, 0.22, "sine");
+      },
+    },
+    {
+      id: "radar",
+      name: "Radar",
+      period: 1800,
+      pattern: () => {
+        tone(1046.5, 0, 0.14, 0.2, "sine");
+        tone(1046.5, 0.18, 0.14, 0.2, "sine");
+        tone(1318.5, 0.36, 0.34, 0.2, "sine");
+        tone(1046.5, 0.78, 0.14, 0.2, "sine");
+        tone(783.9, 0.96, 0.5, 0.2, "sine");
+      },
+    },
+    {
+      id: "chime",
+      name: "Chime",
+      period: 2000,
+      pattern: () => {
+        tone(1567.98, 0, 0.5, 0.16, "sine");
+        tone(1318.5, 0.3, 0.5, 0.16, "sine");
+        tone(987.77, 0.6, 0.9, 0.16, "sine");
+        tone(2637, 0, 0.6, 0.05, "sine");
+      },
+    },
+    {
+      id: "siren",
+      name: "Siren",
+      period: 1800,
+      pattern: () => {
+        tone(600, 0, 0.8, 0.22, "sawtooth", 1200);
+        tone(1200, 0.85, 0.8, 0.22, "sawtooth", 600);
+      },
+    },
+    {
+      id: "digital",
+      name: "Digital",
+      period: 1700,
+      pattern: () => {
+        tone(900, 0, 0.09, 0.2, "square");
+        tone(900, 0.12, 0.09, 0.2, "square");
+        tone(900, 0.24, 0.09, 0.2, "square");
+        tone(1200, 0.4, 0.09, 0.2, "square");
+        tone(1200, 0.52, 0.09, 0.2, "square");
+      },
+    },
+    {
+      id: "dawn",
+      name: "Dawn",
+      period: 2200,
+      pattern: () => {
+        tone(523.25, 0, 0.35, 0.18, "sine");
+        tone(659.26, 0.4, 0.35, 0.18, "sine");
+        tone(783.99, 0.8, 0.5, 0.18, "sine");
+        tone(1046.5, 1.3, 0.8, 0.16, "sine");
+      },
+    },
+  ];
+
+  const TONE_IDS = new Set(RINGTONES.map((t) => t.id));
+  const toneById = (id) => RINGTONES.find((t) => t.id === id) || RINGTONES[0];
+
+  function playPattern(def) {
+    if (!settings.sound) return;
+    def.pattern();
+  }
+
+  let previewStopper = null;
+
+  function previewTone(toneId) {
+    if (!settings.sound) {
+      toast("Alarm sound is off in settings");
+      return;
+    }
+    previewStopper && previewStopper();
+    previewStopper = null;
+    const def = toneById(toneId);
+    playPattern(def);
+    const iv = setInterval(() => playPattern(def), def.period);
+    previewStopper = () => clearInterval(iv);
+    clearTimeout(previewStopper.t);
+    previewStopper.t = setTimeout(() => {
+      clearInterval(iv);
+      previewStopper = null;
+    }, def.period * 2 + 200);
   }
 
   /* ------------------------------------------------------------
@@ -472,6 +595,7 @@
       label: typeof a.label === "string" ? a.label : "",
       days: Array.isArray(a.days) ? a.days.filter((d) => d >= 0 && d <= 6) : [],
       enabled: a.enabled !== false,
+      tone: TONE_IDS.has(a.tone) ? a.tone : "classic",
       snoozeUntil: typeof a.snoozeUntil === "number" ? a.snoozeUntil : null,
       lastKey: a.lastKey || null,
     }));
@@ -604,18 +728,21 @@
     return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}-${date.getHours()}-${date.getMinutes()}`;
   }
 
-  function startAlarmSound() {
+  function startAlarmSound(toneId) {
     stopAlarmSound();
     if (!settings.sound) return;
-    alarmPattern();
+    const def = toneById(toneId);
+    playPattern(def);
     alarmLoop = setInterval(() => {
-      if (settings.sound) alarmPattern();
-    }, 1600);
+      if (settings.sound) playPattern(def);
+    }, def.period);
   }
 
   function stopAlarmSound() {
     clearInterval(alarmLoop);
     alarmLoop = null;
+    previewStopper && previewStopper();
+    previewStopper = null;
   }
 
   function fireAlarm(alarm) {
@@ -634,9 +761,10 @@
       day: "numeric",
       month: "long",
     })}`;
+    $("#ringSnooze").textContent = `Snooze ${settings.snoozeMin || 5} min`;
     $("#ringOverlay").hidden = false;
 
-    startAlarmSound();
+    startAlarmSound(alarm.tone);
     vibrate([500, 250, 500, 250, 800]);
   }
 
@@ -657,10 +785,11 @@
     stopAlarmSound();
     stopVibrate();
     if (ringingAlarm) {
-      ringingAlarm.snoozeUntil = Date.now() + 5 * 60 * 1000;
+      const mins = settings.snoozeMin || 5;
+      ringingAlarm.snoozeUntil = Date.now() + mins * 60 * 1000;
       ringingAlarm.lastKey = null;
       ringingAlarm = null;
-      toast("Snoozed for 5 minutes");
+      toast(`Snoozed for ${mins} minutes`);
     }
     $("#ringOverlay").hidden = true;
     saveAlarms();
@@ -707,6 +836,23 @@
   const DAY_LETTERS = ["S", "M", "T", "W", "T", "F", "S"];
   let editingAlarmId = null;
   let selectedDays = [];
+  let selectedTone = "classic";
+
+  function renderToneChips() {
+    const list = $("#toneList");
+    list.innerHTML = RINGTONES.map(
+      (t) => `<button type="button" class="chip tone-chip${t.id === selectedTone ? " on" : ""}" data-tone="${t.id}" aria-pressed="${t.id === selectedTone}">${t.name}</button>`
+    ).join("");
+  }
+
+  $("#toneList").addEventListener("click", (event) => {
+    const chip = event.target.closest("[data-tone]");
+    if (!chip) return;
+    selectedTone = chip.dataset.tone;
+    renderToneChips();
+  });
+
+  $("#tonePreview").addEventListener("click", () => previewTone(selectedTone));
 
   function buildDayChips() {
     const row = $("#dayRow");
@@ -748,7 +894,9 @@
     )}`;
     $("#alarmLabel").value = alarm ? alarm.label : "";
     selectedDays = alarm ? [...alarm.days] : [];
+    selectedTone = alarm ? alarm.tone : "classic";
     renderDayChips();
+    renderToneChips();
 
     $("#alarmDelete").hidden = !alarm;
     openSheet("alarmSheet");
@@ -776,6 +924,7 @@
         alarm.mm = mm;
         alarm.label = label;
         alarm.days = [...selectedDays];
+        alarm.tone = selectedTone;
         alarm.enabled = true;
         alarm.snoozeUntil = null;
         alarm.lastKey = null;
@@ -787,6 +936,7 @@
         mm,
         label,
         days: [...selectedDays],
+        tone: selectedTone,
         enabled: true,
         snoozeUntil: null,
         lastKey: null,
@@ -862,8 +1012,19 @@
     }
   });
 
-  $("#setLight").addEventListener("change", (event) => {
-    settings.theme = event.target.checked ? "light" : "dark";
+  $("#themeSeg").addEventListener("click", (event) => {
+    const btn = event.target.closest("[data-skin]");
+    if (!btn) return;
+    settings.skin = btn.dataset.skin;
+    settings.theme = btn.dataset.theme;
+    saveSettings();
+    applySettings();
+  });
+
+  $("#snoozeSeg").addEventListener("click", (event) => {
+    const btn = event.target.closest("[data-min]");
+    if (!btn) return;
+    settings.snoozeMin = Number(btn.dataset.min) || 5;
     saveSettings();
     applySettings();
   });
@@ -876,6 +1037,58 @@
       clearInterval(doneLoop);
     }
   });
+
+  $("#setUiSound").addEventListener("change", (event) => {
+    settings.uiSound = event.target.checked;
+    saveSettings();
+    if (settings.uiSound) uiSound("toggle");
+  });
+
+  /* ------------------------------------------------------------
+      UI sound effects — soft taps, blips, sweeps
+   ------------------------------------------------------------ */
+
+  function uiSound(kind = "tap") {
+    if (!settings.uiSound) return;
+    switch (kind) {
+      case "toggle":
+        tone(900, 0, 0.05, 0.06, "square");
+        tone(1240, 0.06, 0.06, 0.05, "square");
+        break;
+      case "tab":
+        tone(640, 0, 0.05, 0.05, "sine");
+        tone(960, 0.05, 0.07, 0.045, "sine");
+        break;
+      case "open":
+        tone(520, 0, 0.06, 0.05, "sine");
+        tone(780, 0.07, 0.08, 0.045, "sine");
+        break;
+      default: // tap
+        tone(1150, 0, 0.035, 0.05, "sine");
+    }
+  }
+
+  document.addEventListener(
+    "click",
+    (event) => {
+      if (event.target.closest(".switch")) {
+        uiSound("toggle");
+        return;
+      }
+      if (event.target.closest(".tab")) {
+        uiSound("tab");
+        return;
+      }
+      if (
+        event.target.closest(".chip") ||
+        event.target.closest(".day-chip") ||
+        event.target.closest("button.btn")
+      ) {
+        uiSound("tap");
+      }
+    },
+    true
+  );
 
   /* ------------------------------------------------------------
      City picker
@@ -994,13 +1207,28 @@
       timerFinished();
       return;
     }
+
+    // soft tick during the last 5 seconds
+    if (settings.uiSound) {
+      const sec = Math.ceil(timer.remaining / 1000);
+      if (sec !== lastTickSec) {
+        if (lastTickSec !== null && sec <= 5 && sec > 0) {
+          tone(1400, 0, 0.03, 0.07, "square");
+        }
+        lastTickSec = sec;
+      }
+    }
+
     updateTimerUI();
   }
+
+  let lastTickSec = null;
 
   function beginTimer() {
     clearInterval(timer.tick);
     timer.endAt = Date.now() + timer.remaining;
     timer.running = true;
+    lastTickSec = null;
     timer.tick = setInterval(timerFrame, 100);
     updateTimerUI();
   }

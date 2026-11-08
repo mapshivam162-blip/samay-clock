@@ -1274,3 +1274,230 @@ body::before {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ============================================================
+   New components — ringtones, settings segmented controls
+   ============================================================ */
+
+.sheet-label {
+  margin: 14px 2px 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.tone-list {
+  justify-content: flex-start;
+}
+
+.tone-chip.on {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.preview-row {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 12px;
+}
+
+.seg {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 4px;
+  margin: 0 0 16px;
+  padding: 4px;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+}
+
+.seg button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 9px 4px;
+  border-radius: 11px;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+  white-space: nowrap;
+}
+
+.seg button.on {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+.seg button:active {
+  transform: scale(0.97);
+}
+
+/* ============================================================
+   iOS skin — Apple-style look (dark + light)
+   ============================================================ */
+
+html[data-skin="ios"] body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+}
+
+html[data-skin="ios"] {
+  --accent: #0a84ff;
+  --accent-2: #5e5ce6;
+  --accent-soft: rgba(10, 132, 255, 0.16);
+  --radius: 20px;
+}
+
+html[data-skin="ios"][data-theme="dark"] {
+  --bg: #000000;
+  --bg-soft: #1c1c1e;
+  --card: rgba(28, 28, 30, 0.72);
+  --card-strong: rgba(44, 44, 46, 0.9);
+  --card-border: rgba(84, 84, 88, 0.4);
+  --text: #ffffff;
+  --muted: #98989f;
+  --danger: #ff453a;
+  --good: #30d158;
+  --shadow: 0 24px 70px rgba(0, 0, 0, 0.7);
+  --tabbar-bg: rgba(22, 22, 24, 0.82);
+}
+
+html[data-skin="ios"][data-theme="light"] {
+  --bg: #f2f2f7;
+  --bg-soft: #ffffff;
+  --card: rgba(255, 255, 255, 0.82);
+  --card-strong: #ffffff;
+  --card-border: rgba(60, 60, 67, 0.12);
+  --text: #1c1c1e;
+  --muted: #6c6c70;
+  --danger: #ff3b30;
+  --good: #34c759;
+  --shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+  --tabbar-bg: rgba(249, 249, 251, 0.85);
+}
+
+/* iOS: flat radial glow off, cleaner surfaces */
+html[data-skin="ios"] body::before {
+  background:
+    radial-gradient(60% 50% at 50% 0%, var(--accent-soft), transparent 72%);
+}
+
+/* iOS: sheets feel like bottom cards */
+html[data-skin="ios"] .sheet {
+  border-radius: 22px 22px 34px 34px;
+  border: none;
+}
+
+html[data-skin="ios"] .sheet::before {
+  content: "";
+  position: absolute;
+  top: 7px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 38px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--muted);
+  opacity: 0.5;
+}
+
+html[data-skin="ios"] .sheet-top,
+html[data-skin="ios"] .sheet-head {
+  padding-top: 18px;
+}
+
+/* iOS: green switches */
+html[data-skin="ios"] .switch span {
+  background: rgba(120, 120, 128, 0.32);
+}
+
+html[data-skin="ios"] .switch input:checked + span {
+  background: var(--good);
+  box-shadow: none;
+}
+
+html[data-skin="ios"] .switch span::after {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* iOS: flat circular accent buttons */
+html[data-skin="ios"] .btn {
+  border-radius: 14px;
+}
+
+html[data-skin="ios"] .btn.primary,
+html[data-skin="ios"][data-theme="light"] .btn.primary {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: none;
+}
+
+html[data-skin="ios"] .btn.ghost {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--card-border);
+}
+
+html[data-skin="ios"] .btn.danger {
+  background: transparent;
+  color: var(--danger);
+  border: 1px solid var(--card-border);
+}
+
+/* iOS: day chips & tone chips become rounded pill groups */
+html[data-skin="ios"] .day-chip,
+html[data-skin="ios"] .chip {
+  border-radius: 999px;
+}
+
+html[data-skin="ios"] .day-chip.on,
+html[data-skin="ios"] .chip.on,
+html[data-skin="ios"] .tone-chip.on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  box-shadow: none;
+}
+
+html[data-skin="ios"] .seg button.on {
+  background: var(--accent);
+  box-shadow: none;
+}
+
+/* iOS: lighter tab bar, blue active tab */
+html[data-skin="ios"] .tabbar {
+  border-top: 0.5px solid var(--card-border);
+  padding-bottom: max(10px, var(--safe-b));
+}
+
+html[data-skin="ios"] .tab.active {
+  color: var(--accent);
+}
+
+html[data-skin="ios"] .fab {
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+}
+
+/* iOS: hero uses tighter SF-style numerals */
+html[data-skin="ios"] .hero-time,
+html[data-skin="ios"] .digital {
+  letter-spacing: -0.02em;
+  font-weight: 700;
+}
+
+html[data-skin="ios"] .card {
+  border-radius: var(--radius);
+  border: none;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
+}

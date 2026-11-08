@@ -4,12 +4,15 @@ Android ke Clock app jaisa ek modern, offline-ready web app. Pure HTML + CSS + V
 
 ## Features
 
-- ⏰ **Alarm** — add, edit, delete, repeat days (weekdays / weekends / custom), toggle on/off, snooze 5 min, full-screen ringing overlay with sound + vibration
+- ⏰ **Alarm** — add, edit, delete, repeat days (weekdays / weekends / custom), toggle on/off, selectable snooze length (5/10/15/30 min), full-screen ringing overlay with sound + vibration
+- 🎵 **6 alarm ringtones** — Classic, Radar, Chime, Siren, Digital, Dawn (Web Audio se banaye) — per-alarm selection + live preview
+- 🔊 **UI sound effects** — halki tap clicks, toggle blips, tab sweep aur timer ke last 5 seconds mein tick (settings se off kar sakte hain)
+- 🍎 **Apple UI theme** — Material Dark / Light + **iOS Dark / iOS Light** skins, settings me 4-way picker
 - 🕒 **Clock** — big digital time, 12/24-hour format, date, "next alarm in ..." pill
 - 🌍 **World clock** — 55+ cities, live times, UTC offset aur day difference (Tomorrow / Yesterday), search & add
 - ⏱️ **Timer** — circular progress ring, h/m/s input, quick presets, pause/resume, +1 min, completion chime + overlay
 - ⏹️ **Stopwatch** — 1/100s precision, laps with fastest (green) / slowest (red) highlight
-- 🌙 **Dark + light theme**, settings persistence via `localStorage`
+- 🌙 **4 themes** (Material + iOS skins, dark/light), settings persistence via `localStorage`
 - 📱 **PWA** — installable, offline-cached via service worker
 - Zero dependencies, works completely offline
 

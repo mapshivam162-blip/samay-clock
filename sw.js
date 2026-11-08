@@ -1,5 +1,5 @@
 /* Samay service worker — offline cache for the core app */
-const CACHE = "samay-v1";
+const CACHE = "samay-v2";
 const ASSETS = [
   "./",
   "./index.html",

@@ -177,9 +177,16 @@
         <h2 id="alarmSheetTitle">New alarm</h2>
         <button class="icon-btn" data-close aria-label="Close">✕</button>
       </div>
+      <div class="sheet-label">Time</div>
       <input type="time" id="alarmTime" class="time-input" />
       <input type="text" id="alarmLabel" class="text-input" placeholder="Label (optional)" maxlength="28" autocomplete="off" />
+      <div class="sheet-label">Repeat</div>
       <div class="day-row" id="dayRow"></div>
+      <div class="sheet-label">Ringtone</div>
+      <div class="presets tone-list" id="toneList"></div>
+      <div class="preview-row">
+        <button class="btn ghost preview-btn" id="tonePreview" type="button">▶ Play preview</button>
+      </div>
       <div class="sheet-actions">
         <button class="btn danger" id="alarmDelete" hidden>Delete</button>
         <button class="btn primary" id="alarmSave">Save alarm</button>
@@ -215,10 +222,34 @@
       </div>
       <div class="setting-row">
         <div>
-          <div class="setting-name">Light theme</div>
-          <div class="setting-sub">Easier on the eyes in daylight</div>
+          <div class="setting-name">Appearance</div>
+          <div class="setting-sub">Material ya Apple UI look</div>
         </div>
-        <label class="switch"><input type="checkbox" id="setLight" /><span></span></label>
+      </div>
+      <div class="seg" id="themeSeg">
+        <button type="button" data-skin="material" data-theme="dark">Dark</button>
+        <button type="button" data-skin="material" data-theme="light">Light</button>
+        <button type="button" data-skin="ios" data-theme="dark">iOS Dark</button>
+        <button type="button" data-skin="ios" data-theme="light">iOS Light</button>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-name">UI sounds</div>
+          <div class="setting-sub">Tap par halki click aur blip</div>
+        </div>
+        <label class="switch"><input type="checkbox" id="setUiSound" /><span></span></label>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-name">Snooze length</div>
+          <div class="setting-sub">Snooze dabane par kitni der baad phir bajega</div>
+        </div>
+      </div>
+      <div class="seg" id="snoozeSeg">
+        <button type="button" data-min="5">5m</button>
+        <button type="button" data-min="10">10m</button>
+        <button type="button" data-min="15">15m</button>
+        <button type="button" data-min="30">30m</button>
       </div>
       <div class="setting-row">
         <div>
